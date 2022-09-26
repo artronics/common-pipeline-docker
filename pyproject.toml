@@ -1,0 +1,21 @@
+[tool.poetry]
+name = "vajeh-pipeline-docker"
+version = "0.1.0"
+description = "docker container for common pipeline build and deploy"
+authors = ["Jalal Hosseini <@artronics>"]
+license = "MIT"
+readme = "README.md"
+packages = [{include = "vajeh_pipeline_docker"}]
+
+[virtualenvs]
+create = true
+in-project = true
+path = ".venv"
+
+[tool.poetry.dependencies]
+python = "^3.9"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

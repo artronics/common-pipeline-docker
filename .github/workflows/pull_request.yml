@@ -1,0 +1,22 @@
+name: 'Pull Request'
+
+on:
+  push:
+    branches:
+      - '**'
+      - '!master'
+
+jobs:
+  docker:
+    name: Docker
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - run: |
+          echo github.event.number = ${{ github.event.number  }}
+          echo github.event.pull_request.number = ${{ github.event.pull_request.number }}
+          echo github.event.issue.number = ${{ github.event.issue.number }}
+        name: check
