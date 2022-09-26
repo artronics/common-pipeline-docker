@@ -7,6 +7,9 @@ license = "MIT"
 readme = "README.md"
 packages = [{include = "vajeh_pipeline_docker"}]
 
+[tool.poetry.group.dev.dependencies]
+invoke = "^1.7.1"
+
 [virtualenvs]
 create = true
 in-project = true
@@ -14,6 +17,9 @@ path = ".venv"
 
 [tool.poetry.dependencies]
 python = "^3.9"
+toml = "^0.10.2"
+semver = "^2.13.0"
+GitPython = "^3.1.27"
 
 
 [build-system]
