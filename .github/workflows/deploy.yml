@@ -9,7 +9,7 @@ jobs:
   deploy:
     name: Deploy
     runs-on: ubuntu-latest
-    container: artronics/pipeline
+    container: artronics/pipeline:latest
     env:
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 #      GIT_USERNAME: ${{ github.actor }}

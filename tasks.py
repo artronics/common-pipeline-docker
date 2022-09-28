@@ -28,6 +28,5 @@ def docker_push(c):
     c.run(f"docker push {docker_username}/pipeline")
 
 
-@task
-def build(c):
-    c.run("echo yo")
+def docker_push_multi(c):
+    c.run(f"docker buildx build --platform linux/amd64,linux/arm64 --push -t {docker_username}/pipelinen .")
