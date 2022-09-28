@@ -12,16 +12,16 @@ jobs:
     container: artronics/pipeline:0.0.1
     env:
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-#      GIT_USERNAME: ${{ github.actor }}
-#      GIT_REMOTE_URL: ${{ github.repository }}
+      GIT_USERNAME: ${{ github.actor }}
+      GIT_REMOTE_URL: ${{ github.repository }}
     steps:
       - name: Checkout
         uses: actions/checkout@v2
 
       - name: check
         run: |
-          ls
+          ls -la
           pwd
           echo $GIT_USERNAME
           echo $GIT_REMOTE_URL
-#          poetry run python vajeh_pipeline_docker/git_util.py -u $GIT_USERNAME -p $GITHUB_TOKEN  -t 1.5.2 $GIT_REMOTE_URL
+          poetry run python vajeh_pipeline_docker/git_util.py -u $GIT_USERNAME -p $GITHUB_TOKEN  -t 1.5.2 $GIT_REMOTE_URL
