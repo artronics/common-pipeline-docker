@@ -1,6 +1,19 @@
+"""version.py
+
+Usage:
+  version.py [--bump BUMP] DIR
+  version.py (-h | --help)
+
+Options:
+  -h --help                       Show this screen
+  DIR                             Absolute path to project directory containing poetry pyproject.toml file
+  --bump=[major | minor | patch]  Bump [major | minor | patch] version [default: minor]
+
+"""
+from docopt import docopt
+
 import sys
 import semver
-from git import Repo
 
 import toml
 
@@ -20,26 +33,17 @@ def calc_version(prj_path, bump):
     return new_ver
 
 
-def add_tag(proj_path, new_ver):
-    repo = Repo(proj_path)
-    # ref = repo.create_tag(f"v{new_ver}")
-    # repo.remote("origin").push(ref.path)
-
-
 def main(prj_path, bump):
     new_ver = calc_version(prj_path, bump)
-    add_tag(prj_path, new_ver)
+    print(new_ver)
 
-
-def print_usage():
-    print("Usage:\nversion <absolute/path/to/project> [major|minor|patch]")
+    return new_ver
 
 
 if __name__ == '__main__':
-    if len(sys.argv) < 3:
-        print_usage()
+    args = docopt(__doc__)
+    if not args["--bump"] in ("major", "minor", "patch"):
+        print(__doc__)
+        print("ERROR: wrong value for --bump option. It must be one of \"major\", \"minor\" or \"patch\"")
         sys.exit(1)
-
-    path = sys.argv[1]
-    bump = sys.argv[2]
-    main(path, bump)
+    main(args["DIR"], args["--bump"])

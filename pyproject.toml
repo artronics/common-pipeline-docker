@@ -19,7 +19,7 @@ path = ".venv"
 python = "^3.9"
 toml = "^0.10.2"
 semver = "^2.13.0"
-GitPython = "^3.1.27"
+docopt = "^0.6.2"
 
 
 [build-system]

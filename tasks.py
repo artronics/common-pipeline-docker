@@ -27,6 +27,7 @@ def docker_build(c):
 def docker_push(c):
     c.run(f"docker push {docker_username}/pipeline")
 
+
 @task
 def build(c):
     c.run("echo yo")
