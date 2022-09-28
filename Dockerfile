@@ -9,6 +9,6 @@ COPY . /app
 RUN cd /app && poetry install
 
 
-CMD /bin/bash
+#CMD /bin/bash
 
-# poetry run python vajeh_pipeline_docker/git_util.py -u $GIT_USERNAME -p $GIT_PASSWORD -t 1.2.2 https://github.com/artronics/common-pipeline-docker.git
+ENTRYPOINT ["terraform"]
