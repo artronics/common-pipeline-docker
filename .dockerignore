@@ -3,3 +3,7 @@
 .env
 .github
 .git
+tasks.py
+README.md
+.gitignore
+
