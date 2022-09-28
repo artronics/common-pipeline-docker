@@ -24,4 +24,9 @@ jobs:
           pwd
           echo $GIT_USERNAME
           echo $GIT_REMOTE_URL
-          poetry run python vajeh_pipeline_docker/git_util.py -u $GIT_USERNAME -p $GITHUB_TOKEN  -t 1.5.2 $GIT_REMOTE_URL
+          echo https://github.com/${GITHUB_TOKEN}.git
+          ls -la /app
+          
+          poetry install
+          poetry run python vajeh_pipeline_docker/git_util.py -u $GIT_USERNAME -p https://github.com/${GITHUB_TOKEN}.git  -t 1.5.2 $GIT_REMOTE_URL
+          
