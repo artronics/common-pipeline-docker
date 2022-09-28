@@ -19,6 +19,7 @@ from docopt import docopt
 
 
 def add_tag(remote, tag):
+    # TODO: fix exit with non zero from subprocess
     subprocess.run(f"git tag {tag}".split(" "))
     subprocess.run(f"git push {remote} {tag}".split(" "))
 
