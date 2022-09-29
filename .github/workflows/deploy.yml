@@ -36,6 +36,7 @@ jobs:
           new_ver=$(version --bump patch $(pwd))
           echo new version $new_ver
           poetry version $new_ver
+          git add pyproject.toml
           git commit -m "Bump version: $new_ver"
           git push pipeline master
           git tag $new_ver
