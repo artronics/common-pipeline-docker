@@ -25,6 +25,11 @@ def add_remote(url, username, token, remote):
     cmd(f"git remote add {remote} {new_url}", "creating remote failed")
 
 
+def add_config(name, email):
+    cmd(f"git config --global user.name {name}")
+    cmd(f"git config --global user.email {email}")
+
+
 def main(username, token, remote_url, remote_name):
     add_remote(remote_url, username, token, remote_name)
 
