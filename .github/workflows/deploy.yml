@@ -27,6 +27,7 @@ jobs:
           echo $GIT_REMOTE_URL
           echo https://github.com/${GIT_REMOTE_URL}.git
           ls -la /app
+          poetry install
           
           git config --global user.email "pipeline@artronics.com"
           git config --global user.name "github-action pipeline"
