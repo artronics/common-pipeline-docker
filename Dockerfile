@@ -9,7 +9,7 @@ RUN apt update && apt install --no-install-recommends -y git
 RUN pip install poetry invoke
 
 COPY . /app
-RUN cd /app && poetry install
+RUN cd /app && poetry config virtualenvs.create false && poetry install
 
 COPY scripts/git-helper /bin/git-helper
 COPY scripts/version /bin/version

@@ -1,5 +1,2 @@
 #! /bin/bash
-d=$(pwd)
-cd /app || exit
-poetry run python /app/vajeh_pipeline_docker/git_helper.py "$@"
-cd "$d" || exit
+python /app/vajeh_pipeline_docker/git_helper.py "$@"
