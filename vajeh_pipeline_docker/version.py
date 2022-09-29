@@ -1,21 +1,22 @@
 """version.py
 
 Usage:
-  version.py [--bump BUMP] DIR
+  version.py [--bump BUMP] [--write] DIR
   version.py (-h | --help)
 
 Options:
   -h --help                       Show this screen
   DIR                             Absolute path to project directory containing poetry pyproject.toml file
   --bump=[major | minor | patch]  Bump [major | minor | patch] version [default: minor]
+  -w --write                      Modify the pyproject.toml file with the new version
 
 """
-from docopt import docopt
-
+import datetime
 import sys
-import semver
 
+import semver
 import toml
+from docopt import docopt
 
 
 def calc_version(prj_path, bump):
@@ -33,9 +34,26 @@ def calc_version(prj_path, bump):
     return new_ver
 
 
-def main(prj_path, bump):
+def rewrite_file(prj_path, new_ver):
+    content = ""
+    with open(f"{prj_path}/pyproject.toml", "r") as f:
+        lines = f.readlines()
+        for line in lines:
+            if line.startswith("version"):
+                content = content + f"version = \"{new_ver}\" # Auto updated on {datetime.datetime.now()}\n"
+            else:
+                content = content + line
+
+    with open(f"{prj_path}/pyproject.toml", "w") as f:
+        f.write(content)
+
+
+def main(prj_path, bump, write):
     new_ver = calc_version(prj_path, bump)
-    print(new_ver)
+    if write:
+        rewrite_file(prj_path, new_ver)
+    else:
+        print(new_ver)
 
     return new_ver
 
@@ -46,4 +64,4 @@ if __name__ == '__main__':
         print(__doc__)
         print("ERROR: wrong value for --bump option. It must be one of \"major\", \"minor\" or \"patch\"")
         sys.exit(1)
-    main(args["DIR"], args["--bump"])
+    main(args["DIR"], args["--bump"], args["--write"])

@@ -22,11 +22,18 @@ jobs:
         run: |
           ls -la
           pwd
+          echo $SHELL
           echo $GIT_USERNAME
           echo $GIT_REMOTE_URL
           echo https://github.com/${GIT_REMOTE_URL}.git
           ls -la /app
           
-          poetry install
-          poetry run python vajeh_pipeline_docker/git_util.py -u $GIT_USERNAME -p $GITHUB_TOKEN -t 1.5.2 https://github.com/${GIT_REMOTE_URL}.git
+          git-helper -u $GIT_USERNAME -p $GITHUB_TOKEN https://github.com/${GIT_REMOTE_URL}.git
+          new_ver=$(version --bump patch)
+          echo new version $new_ver
+          poetry version $new_ver
+          git commit -m "Bump version: $new_ver"
+          git push pipeline master
+          git tag $new_ver
+          git push pipeline $new_ver
           

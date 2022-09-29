@@ -30,4 +30,6 @@ def docker_push(c):
 
 @task
 def docker_push_multi(c):
-    c.run(f"docker buildx build --platform linux/amd64,linux/arm64 --push -t {docker_username}/pipeline:0.0.1 .")
+    c.run(
+        f"docker buildx build --platform linux/amd64,linux/arm64 --push "
+        f"-t {docker_username}/pipeline:latest -t {docker_username}/pipeline:0.0.2 .")
