@@ -1,39 +1,61 @@
-"""git.py
+import dataclasses
 
-Usage:
-  git.py --username username --password token [--remote-name remote-name] --remote-url remote-url
-  git.py (-h | --help)
-
-Options:
-  -h --help                       Show this screen
-  URL                             GitHub repository url
-  -n --remote-name remote-name    Remote name [default: pipeline]
-  -r --remote-url remote-url      Add remote to git with username and token
-  -u --username username          GitHub username
-  -p --password token             GitHub token. Note: don't use your password
-
-"""
-
-from docopt import docopt
-from mycmd import cmd
+from git import Repo, Remote
+from typing import List
 
 
-def add_remote(url, username, token, remote):
+@dataclasses.dataclass
+class GitConfig:
+    repo_path: str
+    account_name: str
+    commit_name: str
+    commit_email: str
+    remote_url: str
+    token: str
+    remote_name: str = "pipeline"
+
+
+def add_remote(conf: GitConfig, repo: Repo) -> (Repo, Remote):
     i = len("https://")
-    new_url = url[:i] + username + ":" + token + "@" + url[i:]
+    url = conf.remote_url
+    auth_url = url[:i] + conf.account_name + ":" + conf.token + "@" + url[i:]
 
-    cmd(f"git remote add {remote} {new_url}", "creating remote failed")
+    remotes = list(filter(lambda x: x.name == conf.remote_name, repo.remotes))
+    if remotes:
+        remote = remotes[0]
+        u = list(remote.urls)
+        if not u[0] == auth_url:
+            remote.set_url(auth_url, u[0])
+    else:
+        remote = repo.create_remote(conf.remote_name, auth_url)
+
+    return repo, remote
 
 
-def add_config(name, email):
-    cmd(f"git config --global user.name {name}")
-    cmd(f"git config --global user.email {email}")
+def commit(repo: Repo, files: List[str], message: str, remote: Remote) -> (Repo, Remote):
+    repo.index.add(files)
+    repo.index.commit(message)
+    repo.remote(remote.name).push()
+
+    return repo, remote
 
 
-def main(username, token, remote_url, remote_name):
-    add_remote(remote_url, username, token, remote_name)
+def tag(repo: Repo, tag: str, remote: Remote) -> (Repo, Remote):
+    git_tag = repo.create_tag(tag)
+    repo.remote(remote.name).push(git_tag.path)
+
+    return repo, remote
 
 
-if __name__ == '__main__':
-    args = docopt(__doc__)
-    main(args["--username"], args["--password"], args["--remote-url"], args["--remote-name"])
+def config(conf: GitConfig, repo: Repo) -> Repo:
+    cr = repo.config_reader()
+    if not cr.has_option("user", "email"):
+        repo.config_writer().set_value("user", "email", conf.commit_email).release()
+    if not cr.has_option("user", "name"):
+        repo.config_writer().set_value("user", "name", conf.commit_name).release()
+
+    return repo
+
+
+def get_repo(conf: GitConfig) -> Repo:
+    return Repo(conf.repo_path)

@@ -1,2 +1,0 @@
-#! /bin/bash
-python /app/vajeh_pipeline_docker/bump_version.py "$@"

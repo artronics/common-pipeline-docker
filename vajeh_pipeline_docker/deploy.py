@@ -1,13 +1,16 @@
-"""version.py
+"""deploy.py
 
 Usage:
-  version.py [--bump=BUMP] \
+  deploy.py [--bump=BUMP] \
 [--git-remote-name=name] [--github-account=account] --github-token=token \
 --git-remote-url=url --git-user-name=user-name --git-user-email=user-email
-  version.py (-h | --help)
+  deploy.py [--bump=BUMP] --github-context=context --git-user-name=user-name --git-user-email=user-email
+
+  deploy.py (-h | --help)
 
 Options:
   -h --help                       Show this screen
+  -c --github-context context            GitHub context as JSON
   --bump=[major | minor | patch]  Bump [major | minor | patch] version [default: minor]
   --git-remote-name remote-name    Remote name [default: pipeline]
   --git-remote-url remote-url      Add remote to git with username and token
@@ -17,11 +20,11 @@ Options:
   --github-account account             GitHub account name. If not present it will be inferred from --git-remote-url
 
 """
+import json
 import os
 import re
 import sys
 from dataclasses import dataclass
-from typing import Literal
 
 from docopt import docopt
 
@@ -33,26 +36,18 @@ from version import VersionConfig
 
 @dataclass
 class Config:
-    github_account: str
-    git_user_name: str
-    git_user_email: str
-    git_remote_url: str
-    github_token: str
-    git_remote_name: str = "pipeline"
-    bump: Literal["major", "minor", "patch"] = "minor"
+    git_config: GitConfig
+    version_config: VersionConfig
 
 
 def main(_config: Config):
-    cwd = os.getcwd()
-    git_conf = GitConfig(repo_path=cwd, account_name=config.github_account, commit_name=config.git_user_name,
-                         commit_email=config.git_user_email, remote_url=config.git_remote_url,
-                         token=config.github_token, remote_name=config.git_remote_name)
+    git_conf = config.git_config
 
     repo = _git.get_repo(git_conf)
     repo = _git.config(git_conf, repo)
     repo, remote = _git.add_remote(git_conf, repo)
 
-    ver_conf = VersionConfig(project_path=cwd, write_file=True, project_type="poetry", bump=config.bump)
+    ver_conf = config.version_config
     new_ver = ver.calc_version(ver_conf)
     changed_files = ver.write_file(ver_conf, new_ver)
 
@@ -75,6 +70,12 @@ if __name__ == '__main__':
         sys.exit(1)
 
 
+    if context := args.get("--github-context"):
+        c = json.loads(context)
+        args["--git-remote-url"] = c["repositoryUrl"].replace("git://", "https://")
+        args["--github-account"] = c["repository_owner"]
+        args["--github-token"] = c["token"]
+
     url_re = r"https://github.com/(.+)/.+\.git$"
     remote_url = args["--git-remote-url"]
     if match := re.search(url_re, remote_url, re.IGNORECASE):
@@ -91,14 +92,15 @@ if __name__ == '__main__':
         if bump != "major" and bump != "minor" and bump != "patch":
             err("--bump must be one of major, minor or patch")
 
-    config = Config(
-        github_account=args["--github-account"],
-        github_token=args["--github-token"],
-        git_user_name=args["--git-user-name"],
-        git_user_email=args["--git-user-email"],
-        git_remote_name=args["--git-remote-name"],
-        git_remote_url=args["--git-remote-url"],
+    cwd = os.getcwd()
+    git_config = GitConfig(repo_path=cwd,
+                           account_name=args["--github-account"],
+                           commit_name=args["--git-user-name"],
+                           commit_email=args["--git-user-email"],
+                           remote_url=args["--git-remote-url"],
+                           token=args["--github-token"],
+                           remote_name=args["--git-remote-name"])
+    ver_config = VersionConfig(project_path=cwd, write_file=True, project_type="poetry", bump=args["--bump"])
+    config = Config(git_config=git_config, version_config=ver_config)
 
-        bump=args["--bump"]
-    )
     main(config)

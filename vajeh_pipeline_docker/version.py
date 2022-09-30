@@ -1,67 +1,56 @@
-"""version.py
-
-Usage:
-  version.py [--bump BUMP] [--write] DIR
-  version.py (-h | --help)
-
-Options:
-  -h --help                       Show this screen
-  DIR                             Absolute path to project directory containing poetry pyproject.toml file
-  --bump=[major | minor | patch]  Bump [major | minor | patch] version [default: minor]
-  -w --write                      Modify the pyproject.toml file with the new version
-
-"""
+import dataclasses
 import datetime
-import sys
+from typing import Literal, List
 
 import semver
 import toml
-from docopt import docopt
+from datetime import datetime
 
 
-def calc_version(prj_path, bump):
-    pyproject_file = toml.load(f"{prj_path}/pyproject.toml")
-    current_ver = semver.VersionInfo.parse(pyproject_file["tool"]["poetry"]["version"])
+@dataclasses.dataclass
+class VersionConfig:
+    project_path: str
+    write_file: bool = True
+    project_type: Literal["poetry"] = "poetry"  # only poetry is supported for now
+    bump: Literal["major", "minor", "patch"] = "minor"
 
-    new_ver = None
-    if bump == 'major':
+
+def calc_version(conf: VersionConfig) -> str:
+    if conf.project_type == "poetry":
+        pyproject = toml.load(f"{conf.project_path}/pyproject.toml")
+    else:
+        raise Exception("only poetry project is supported")
+
+    current_ver = semver.VersionInfo.parse(pyproject["tool"]["poetry"]["version"])
+
+    if conf.bump == "major":
         new_ver = current_ver.bump_major()
-    if bump == 'minor':
-        new_ver = current_ver.bump_minor()
-    if bump == 'patch':
+    elif conf.bump == "patch":
         new_ver = current_ver.bump_patch()
+    else:
+        new_ver = current_ver.bump_minor()
 
-    return new_ver
+    return str(new_ver)
 
 
-def rewrite_file(prj_path, new_ver):
+def write_file(conf: VersionConfig, new_ver: str) -> List[str]:
+    if conf.project_type == "poetry":
+        pyproject = toml.load(f"{conf.project_path}/pyproject.toml")
+    else:
+        raise Exception("only poetry project is supported")
+
+    changed_files = [pyproject]
+
     content = ""
-    with open(f"{prj_path}/pyproject.toml", "r") as f:
+    with open(pyproject, "r") as f:
         lines = f.readlines()
         for line in lines:
             if line.startswith("version"):
-                content = content + f"version = \"{new_ver}\" # Auto updated on {datetime.datetime.now()}\n"
+                content = content + f"version = \"{new_ver}\" # Auto updated on {datetime.now()}\n"
             else:
                 content = content + line
 
-    with open(f"{prj_path}/pyproject.toml", "w") as f:
+    with open(pyproject, "w") as f:
         f.write(content)
 
-
-def main(prj_path, bump, write):
-    new_ver = calc_version(prj_path, bump)
-    if write:
-        rewrite_file(prj_path, new_ver)
-    else:
-        print(new_ver)
-
-    return new_ver
-
-
-if __name__ == '__main__':
-    args = docopt(__doc__)
-    if not args["--bump"] in ("major", "minor", "patch"):
-        print(__doc__)
-        print("ERROR: wrong value for --bump option. It must be one of \"major\", \"minor\" or \"patch\"")
-        sys.exit(1)
-    main(args["DIR"], args["--bump"], args["--write"])
+    return changed_files
