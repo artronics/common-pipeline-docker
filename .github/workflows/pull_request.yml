@@ -10,6 +10,10 @@ jobs:
   docker:
     name: Docker
     runs-on: ubuntu-latest
+    env:
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      GIT_USERNAME: ${{ github.actor }}
+      GIT_REMOTE_URL: ${{ github.repository }}
 
     steps:
       - name: Checkout
@@ -20,3 +24,34 @@ jobs:
           echo github.event.pull_request.number = ${{ github.event.pull_request.number }}
           echo github.event.issue.number = ${{ github.event.issue.number }}
         name: check
+
+
+      - name: version
+        env:
+          CONTEXT: ${{ toJson(github.context) }}
+        run: |
+          ls -la
+          pwd
+          echo $SHELL
+          echo $GIT_USERNAME
+          echo $GIT_REMOTE_URL
+          echo context: $CONTEXT
+          echo https://github.com/${GIT_REMOTE_URL}.git
+          ls -la /app
+          poetry install
+
+#          version --git-remote-name pipeline --git-remote-url "https://github.com/artronics/common-pipeline-docker.git" \
+#            --git-user-name "pipeline local" --git-user-email "pipeline@pipeline.com" --github-token $GITHUB_TOKEN \
+#            --bump minor
+
+
+#          git-helper -u $GIT_USERNAME -p $GITHUB_TOKEN --remote-url https://github.com/${GIT_REMOTE_URL}.git
+#          new_ver=$(version --bump patch $(pwd))
+#          echo new version $new_ver
+#          poetry version $new_ver
+#          git add pyproject.toml
+#          git commit -m "Bump version: $new_ver"
+#          git push pipeline master
+#          git tag $new_ver
+#          git push pipeline $new_ver
+
