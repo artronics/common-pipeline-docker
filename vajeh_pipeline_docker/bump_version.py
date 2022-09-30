@@ -90,12 +90,16 @@ def main(_config: Config):
     with open(pyproject, "w") as f:
         f.write(content)
 
+    git_tag = f"v{new_ver}"
+
     repo.index.add([pyproject])
-    repo.index.commit(f"Publish new version: {new_ver}")
+    repo.index.commit(f"Publish new version: {git_tag}")
     repo.remote(remote.name).push()
 
-    tag = repo.create_tag(f"v{new_ver}")
+    tag = repo.create_tag(git_tag)
     repo.remote(remote.name).push(tag.path)
+
+    print(f"Pushed new tag: {git_tag}")
 
 
 if __name__ == '__main__':
@@ -134,5 +138,4 @@ if __name__ == '__main__':
 
         bump=args["--bump"]
     )
-    print(config)
     main(config)

@@ -9,7 +9,7 @@ jobs:
   deploy:
     name: Deploy
     runs-on: ubuntu-latest
-    container: artronics/pipeline:0.0.3
+    container: artronics/pipeline:0.1.4
     env:
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       GIT_USERNAME: ${{ github.actor }}
@@ -19,18 +19,23 @@ jobs:
         uses: actions/checkout@v2
 
       - name: check
+        env:
+          CONTEXT: ${{ github.context }}
         run: |
           ls -la
           pwd
           echo $SHELL
           echo $GIT_USERNAME
           echo $GIT_REMOTE_URL
+          echo $CONTEXT
           echo https://github.com/${GIT_REMOTE_URL}.git
           ls -la /app
           poetry install
           
-          git config --global user.email "pipeline@artronics.com"
-          git config --global user.name "github-action pipeline"
+          version --git-remote-name pipeline --git-remote-url "https://github.com/artronics/common-pipeline-docker.git" \
+            --git-user-name "pipeline local" --git-user-email "pipeline@pipeline.com" --github-token $GITHUB_TOKEN \
+            --bump minor
+
 
 #          git-helper -u $GIT_USERNAME -p $GITHUB_TOKEN --remote-url https://github.com/${GIT_REMOTE_URL}.git
 #          new_ver=$(version --bump patch $(pwd))
