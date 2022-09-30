@@ -34,15 +34,15 @@ def calc_version(conf: VersionConfig) -> str:
 
 
 def write_file(conf: VersionConfig, new_ver: str) -> List[str]:
+    changed_files = []
     if conf.project_type == "poetry":
-        pyproject = toml.load(f"{conf.project_path}/pyproject.toml")
+        pyproject_file = f"{conf.project_path}/pyproject.toml"
+        changed_files.append(pyproject_file)
     else:
         raise Exception("only poetry project is supported")
 
-    changed_files = [pyproject]
-
     content = ""
-    with open(pyproject, "r") as f:
+    with open(pyproject_file, "r") as f:
         lines = f.readlines()
         for line in lines:
             if line.startswith("version"):
@@ -50,7 +50,7 @@ def write_file(conf: VersionConfig, new_ver: str) -> List[str]:
             else:
                 content = content + line
 
-    with open(pyproject, "w") as f:
+    with open(pyproject_file, "w") as f:
         f.write(content)
 
     return changed_files
