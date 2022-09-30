@@ -67,7 +67,8 @@ def main(_config: Config):
     else:
         remote = repo.create_remote(config.git_remote_name, auth_url)
 
-    pyproject_file = toml.load(f"{cwd}/pyproject.toml")
+    pyproject = f"{cwd}/pyproject.toml"
+    pyproject_file = toml.load(pyproject)
     current_ver = semver.VersionInfo.parse(pyproject_file["tool"]["poetry"]["version"])
 
     if config.bump == 'major':
@@ -78,7 +79,7 @@ def main(_config: Config):
         new_ver = current_ver.bump_minor()
 
     content = ""
-    with open(f"{cwd}/pyproject.toml", "r") as f:
+    with open(pyproject, "r") as f:
         lines = f.readlines()
         for line in lines:
             if line.startswith("version"):
@@ -86,9 +87,15 @@ def main(_config: Config):
             else:
                 content = content + line
 
-    with open(f"{cwd}/pyproject.toml", "w") as f:
+    with open(pyproject, "w") as f:
         f.write(content)
-    print(new_ver)
+
+    repo.index.add([pyproject])
+    repo.index.commit(f"Publish new version: {new_ver}")
+    repo.remote(remote.name).push()
+
+    tag = repo.create_tag(f"v{new_ver}")
+    repo.remote(remote.name).push(tag.path)
 
 
 if __name__ == '__main__':
