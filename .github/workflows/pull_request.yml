@@ -41,6 +41,7 @@ jobs:
           ls -la /app
           poetry install
 
+          deploy -c $CONTEXT --git-user-name "pipeline local" --git-user-email "pipeline@pipeline.com"
 #          version --git-remote-name pipeline --git-remote-url "https://github.com/artronics/common-pipeline-docker.git" \
 #            --git-user-name "pipeline local" --git-user-email "pipeline@pipeline.com" --github-token $GITHUB_TOKEN \
 #            --bump minor
