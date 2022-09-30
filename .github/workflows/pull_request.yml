@@ -28,7 +28,7 @@ jobs:
 
       - name: version
         env:
-          CONTEXT: ${{ toJson(github.context) }}
+          CONTEXT: ${{ toJson(github) }}
         run: |
           ls -la
           pwd
