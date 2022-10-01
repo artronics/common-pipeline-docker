@@ -23,6 +23,8 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
+      - run: echo ${{ toJson(github) }}
+
       - name: Build
         uses: docker/build-push-action@v3
         with:
