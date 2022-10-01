@@ -57,8 +57,8 @@ jobs:
           echo version $VERSION
           echo username $DOCKERHUB_USERNAME 
 
-      - name: Build
+      - name: Build and push
         uses: docker/build-push-action@v3
         with:
           push: true
-          tags: ${{ steps.docker_vars.outputs.DOCKERHUB_USERNAME }}/pipeline:latest,${{ steps.docker_vars.outputs.DOCKERHUB_USERNAME }}/pipeline:${{ needs.version.outputs.VERSION }}
+          tags: ${{ steps.docker_vars.outputs.DOCKERHUB_USERNAME }}/pipeline:latest,${{ steps.docker_vars.outputs.DOCKERHUB_USERNAME }}/pipeline:${{ needs.version.outputs.current_version }}
