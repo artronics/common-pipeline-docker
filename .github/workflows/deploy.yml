@@ -40,8 +40,12 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
+      - name: Output current version
+        id: current-version
+        run: echo "::set-output name=VERSION::$(poetry version -s)"
+
       - name: Build
         uses: docker/build-push-action@v3
         with:
           push: true
-          tags: artronics/pipeline:latest
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/pipeline:latest,${{ secrets.DOCKERHUB_USERNAME }}/pipeline:${{ steps.current-version.outputs.VERSION }}
