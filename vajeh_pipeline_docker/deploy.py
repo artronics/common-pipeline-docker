@@ -1,10 +1,10 @@
 """deploy.py
 
 Usage:
-  deploy.py [--bump=BUMP] \
+  deploy.py version [--bump=BUMP] \
 [--git-remote-name=name] [--github-account=account] --github-token=token \
 --git-remote-url=url --git-user-name=user-name --git-user-email=user-email
-  deploy.py [--bump=BUMP] --github-context=context --git-user-name=user-name --git-user-email=user-email
+  deploy.py version [--bump=BUMP] --github-context=context --git-user-name=user-name --git-user-email=user-email
 
   deploy.py (-h | --help)
 
@@ -102,5 +102,6 @@ if __name__ == '__main__':
                            remote_name=args["--git-remote-name"])
     ver_config = VersionConfig(project_path=cwd, write_file=True, project_type="poetry", bump=args["--bump"])
     config = Config(git_config=git_config, version_config=ver_config)
-
-    main(config)
+    print(args)
+    print(config)
+    # main(config)
