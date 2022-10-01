@@ -11,8 +11,7 @@ RUN pip install poetry invoke
 COPY . /app
 RUN cd /app && poetry config virtualenvs.create false && poetry install
 
-COPY scripts/git-helper /bin/git-helper
-COPY scripts/version /bin/version
-RUN chmod +x /bin/git-helper /bin/version
+COPY scripts/deploy /bin/deploy
+RUN chmod +x /bin/deploy
 
 CMD /bin/bash
