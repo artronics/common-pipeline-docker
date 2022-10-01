@@ -10,40 +10,13 @@ jobs:
     name: Deploy
     runs-on: ubuntu-latest
     container: artronics/pipeline:0.1.6
-    env:
-      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      GIT_USERNAME: ${{ github.actor }}
-      GIT_REMOTE_URL: ${{ github.repository }}
     steps:
       - name: Checkout
         uses: actions/checkout@v2
 
-      - name: check
+      - name: version
         env:
-          CONTEXT: ${{ github.context }}
+          GITHUB_CONTEXT: ${{ toJson(github) }}
         run: |
-          ls -la
-          pwd
-          echo $SHELL
-          echo $GIT_USERNAME
-          echo $GIT_REMOTE_URL
-          echo $CONTEXT
-          echo https://github.com/${GIT_REMOTE_URL}.git
-          ls -la /app
-          poetry install
-          
-          version --git-remote-name pipeline --git-remote-url "https://github.com/artronics/common-pipeline-docker.git" \
-            --git-user-name "pipeline local" --git-user-email "pipeline@pipeline.com" --github-token $GITHUB_TOKEN \
-            --bump minor
-
-
-#          git-helper -u $GIT_USERNAME -p $GITHUB_TOKEN --remote-url https://github.com/${GIT_REMOTE_URL}.git
-#          new_ver=$(version --bump patch $(pwd))
-#          echo new version $new_ver
-#          poetry version $new_ver
-#          git add pyproject.toml
-#          git commit -m "Bump version: $new_ver"
-#          git push pipeline master
-#          git tag $new_ver
-#          git push pipeline $new_ver
-
+          deploy --bump=patch --github-context="$GITHUB_CONTEXT" --git-user-name="pipeline local" \
+            --git-user-email="pipeline@pipeline.com"
