@@ -20,6 +20,14 @@ jobs:
         run: |
           deploy --bump=minor --github-context="$GITHUB_CONTEXT" --git-user-name="pipeline local" \
             --git-user-email="pipeline@pipeline.com"
+
+      - name: Output current version
+        id: current-version
+        run: echo "::set-output name=VERSION::$(poetry version -s)"
+
+    outputs:
+      current-version: ${{ steps.current-version.outputs.VERSION }}
+
   docker:
     name: Docker
     runs-on: ubuntu-latest
@@ -34,7 +42,6 @@ jobs:
       - name: Set version and Docker user
         id: docker-vars
         run: |
-          echo "::set-output name=VERSION::$(poetry version -s)"
           echo "::set-output name=DOCKER_USERNAME::artronics"
 
       - name: Login to DockerHub
@@ -43,8 +50,16 @@ jobs:
           username: ${{ steps.docker-vars.outputs.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
+      - name: check
+        env:
+          VERSION: ${{ needs.version.outputs.VERSION }}
+          USERNAME: ${{ steps.docker-vars.outputs.DOCKERHUB_USERNAME }}
+        run: |
+          echo version $VERSION
+          echo username $DOCKERHUB_USERNAME 
+
       - name: Build
         uses: docker/build-push-action@v3
         with:
           push: true
-          tags: ${{ steps.docker-vars.outputs.DOCKERHUB_USERNAME }}/pipeline:latest,${{ steps.docker-vars.outputs.DOCKERHUB_USERNAME }}/pipeline:${{ steps.docker-vars.outputs.VERSION }}
+          tags: ${{ steps.docker-vars.outputs.DOCKERHUB_USERNAME }}/pipeline:latest,${{ steps.docker-vars.outputs.DOCKERHUB_USERNAME }}/pipeline:${{ needs.version.outputs.VERSION }}
