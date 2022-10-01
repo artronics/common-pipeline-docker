@@ -10,7 +10,6 @@ jobs:
   build:
     name: Build
     runs-on: ubuntu-latest
-#    container: artronics/pipeline:0.1.6
     steps:
       - name: Checkout
         uses: actions/checkout@v2
