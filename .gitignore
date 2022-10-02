@@ -1,4 +1,12 @@
-node_modules
 .idea
+*.iml
 .venv
 .env
+
+dist/**/*
+*.tsbuildinfo
+
+node_modules
+bower_components
+.DS_Store
+Thumbs.db
