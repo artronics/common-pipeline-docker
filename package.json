@@ -1,0 +1,12 @@
+{
+  "name": "vajeh-pipeline-docker",
+  "version": "0.8.0",
+  "main": "src/deploy.ts",
+  "repository": "https://github.com/artronics/common-pipeline-docker.git",
+  "author": "Jalal Hosseini <jalalhosseiny@gmail.com>",
+  "license": "MIT",
+  "devDependencies": {
+    "grunt": "^1.5.3",
+    "shelljs": "^0.8.5"
+  }
+}
