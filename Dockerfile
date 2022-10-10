@@ -9,4 +9,4 @@ RUN yarn global add grunt-cli
 
 COPY . /app
 
-CMD /bin/bash
+CMD ["/bin/bash", "-c"]
