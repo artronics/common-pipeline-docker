@@ -1,17 +1,18 @@
 """deploy.py
 
 Usage:
-  deploy.py [--bump=BUMP] \
+  deploy.py version [--bump=BUMP] \
 [--git-remote-name=name] [--github-account=account] --github-token=token \
 --git-remote-url=url --git-user-name=user-name --git-user-email=user-email
-  deploy.py [--bump=BUMP] --github-context=context --git-user-name=user-name --git-user-email=user-email
+  deploy.py version [--bump=BUMP] (--infer-bump --github-context=context) --git-user-name=user-name --git-user-email=user-email
 
   deploy.py (-h | --help)
 
 Options:
   -h --help                       Show this screen
   -c --github-context context            GitHub context as JSON
-  --bump=[major | minor | patch]  Bump [major | minor | patch] version [default: minor]
+  --bump=[major | minor | patch | infer]  Bump [major | minor | patch] version. If infer is chosen along --infer-bump option then script exit with error if it can't be inferred i.e. it won't default. [default: minor]
+  --infer-bump           Infer the bump from either last commit message or last Pull Request message. The value of this option is the default bump (major, minor or patch) in case this value can't be inferred. If the value can't be inferred and the default value is not given then, script exits with non-zero exit code.
   --git-remote-name remote-name    Remote name [default: pipeline]
   --git-remote-url remote-url      Add remote to git with username and token
   --git-user-name username          git username
@@ -60,6 +61,12 @@ def main(_config: Config):
     print(f"Pushed new tag: {tag}")
 
 
+def infer_bump(_args):
+    strict = _args["--bump"] == "infer"
+    c = _args["--github-context"]
+
+
+
 if __name__ == '__main__':
     args = docopt(__doc__)
 
@@ -92,6 +99,9 @@ if __name__ == '__main__':
         if bump != "major" and bump != "minor" and bump != "patch":
             err("--bump must be one of major, minor or patch")
 
+    if args["--infer-bump"]:
+        infer_bump(args)
+
     cwd = os.getcwd()
     git_config = GitConfig(repo_path=cwd,
                            account_name=args["--github-account"],
@@ -102,5 +112,6 @@ if __name__ == '__main__':
                            remote_name=args["--git-remote-name"])
     ver_config = VersionConfig(project_path=cwd, write_file=True, project_type="poetry", bump=args["--bump"])
     config = Config(git_config=git_config, version_config=ver_config)
-
-    main(config)
+    print(args)
+    print(config)
+    # main(config)

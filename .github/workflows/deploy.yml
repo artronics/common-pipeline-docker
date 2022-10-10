@@ -18,7 +18,7 @@ jobs:
         env:
           GITHUB_CONTEXT: ${{ toJson(github) }}
         run: |
-          deploy --bump=minor --github-context="$GITHUB_CONTEXT" --git-user-name="pipeline local" \
+          deploy version --bump=minor --github-context="$GITHUB_CONTEXT" --git-user-name="pipeline local" \
             --git-user-email="pipeline@pipeline.com"
 
       - name: Output current version
@@ -48,14 +48,6 @@ jobs:
         with:
           username: ${{ steps.docker_vars.outputs.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
-
-      - name: check
-        env:
-          VERSION: ${{ needs.version.outputs.current_version }}
-          USERNAME: ${{ steps.docker_vars.outputs.DOCKERHUB_USERNAME }}
-        run: |
-          echo version $VERSION
-          echo username $DOCKERHUB_USERNAME 
 
       - name: Build and push
         uses: docker/build-push-action@v3
