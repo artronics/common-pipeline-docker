@@ -1,3 +1,13 @@
 .idea
+*.iml
 .venv
 .env
+
+**/__pycache__
+dist/**/*
+*.tsbuildinfo
+
+node_modules
+bower_components
+.DS_Store
+Thumbs.db
