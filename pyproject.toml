@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "vajeh-pipeline-docker"
-version = "0.8.0" # Auto updated on 2022-10-01 20:07:11.156694
+version = "0.9.0" # Auto updated on 2022-10-10 17:19:06.857792
 description = "docker container for common pipeline build and deploy"
 authors = ["Jalal Hosseini <@artronics>"]
 license = "MIT"
